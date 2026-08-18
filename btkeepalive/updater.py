@@ -46,7 +46,7 @@ def cleanup_old_version() -> None:
         log_error("Failed to clean up old executable: %s", exc)
 
 
-def get_latest_release(repo: str = "tothKarolyDavid/bt-keepalive") -> dict | None:
+def get_latest_release(repo: str = "kadato/bt-keepalive") -> dict | None:
     """Fetch the latest release information from GitHub API."""
     url = f"https://api.github.com/repos/{repo}/releases/latest"
     req = urllib.request.Request(

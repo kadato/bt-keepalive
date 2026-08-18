@@ -1,7 +1,7 @@
 # BT KeepAlive
 
-[![CI](https://github.com/tothKarolyDavid/bt-keepalive/actions/workflows/ci.yml/badge.svg)](https://github.com/tothKarolyDavid/bt-keepalive/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/tothKarolyDavid/bt-keepalive?label=download)](https://github.com/tothKarolyDavid/bt-keepalive/releases/latest)
+[![CI](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml/badge.svg)](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/kadato/bt-keepalive?label=download)](https://github.com/kadato/bt-keepalive/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Keep Bluetooth headphones awake on Windows 10/11**: a small system-tray app that plays quiet audio (or periodic silent pulses) so your headset stays connected and you never miss the first second of a notification, video, or call.
@@ -14,9 +14,9 @@ No Python or install wizard required: grab the portable `.exe` and run it.
 
 | Download | Link |
 |----------|------|
-| **BTKeepAlive.exe** (recommended) | [**Download latest release**](https://github.com/tothKarolyDavid/bt-keepalive/releases/latest/download/BTKeepAlive.exe) |
-| Checksum file | [SHA256SUMS.txt](https://github.com/tothKarolyDavid/bt-keepalive/releases/latest/download/SHA256SUMS.txt) |
-| All versions | [GitHub Releases](https://github.com/tothKarolyDavid/bt-keepalive/releases) |
+| **BTKeepAlive.exe** (recommended) | [**Download latest release**](https://github.com/kadato/bt-keepalive/releases/latest/download/BTKeepAlive.exe) |
+| Checksum file | [SHA256SUMS.txt](https://github.com/kadato/bt-keepalive/releases/latest/download/SHA256SUMS.txt) |
+| All versions | [GitHub Releases](https://github.com/kadato/bt-keepalive/releases) |
 
 ### Quick install
 
@@ -33,7 +33,7 @@ No Python or install wizard required: grab the portable `.exe` and run it.
 Get-FileHash "$env:USERPROFILE\Downloads\BTKeepAlive.exe" -Algorithm SHA256
 ```
 
-Compare the hash with `SHA256SUMS.txt` on the [release page](https://github.com/tothKarolyDavid/bt-keepalive/releases/latest).
+Compare the hash with `SHA256SUMS.txt` on the [release page](https://github.com/kadato/bt-keepalive/releases/latest).
 
 ---
 
@@ -130,7 +130,7 @@ Set `BTKEEPALIVE_LOG_LEVEL=DEBUG` for verbose logging.
 **Requirements:** Windows 10/11, Python 3.11+
 
 ```powershell
-git clone https://github.com/tothKarolyDavid/bt-keepalive.git
+git clone https://github.com/kadato/bt-keepalive.git
 cd bt-keepalive
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
