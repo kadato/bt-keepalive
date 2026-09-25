@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 //! BT KeepAlive for Windows.
 //!
 //! Entry point: light CLI commands run anywhere, the full tray app

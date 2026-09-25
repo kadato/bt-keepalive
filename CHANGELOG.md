@@ -2,6 +2,13 @@
 
 <!-- version list -->
 
+## v2.0.1 (2026-09-25)
+
+### Bug Fixes
+
+- Run the release build as a GUI app so Windows does not open a
+  terminal window. Debug builds keep the console for logs.
+
 ## v2.0.0 (2026-09-25)
 
 ### Features
