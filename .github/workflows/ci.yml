@@ -7,32 +7,41 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Format check
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test --workspace
+
+      - name: Frontend syntax check
+        run: node --check btkeepalive-app/settings-ui/main.js
+
+  windows-check:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          python-version: "3.12"
+          targets: x86_64-pc-windows-msvc
+          components: clippy, rustfmt
 
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Ruff check
-        run: ruff check .
+      - name: Check Windows target
+        run: cargo check --target x86_64-pc-windows-msvc --workspace --all-targets
 
-      - name: Ruff format
-        run: ruff format --check .
-
-      - name: Pytest
-        run: pytest
-
-      - name: Build executable
-        run: powershell -ExecutionPolicy Bypass -File build.ps1
-
-      - name: Smoke test executable
-        shell: pwsh
-        run: |
-          & dist/BTKeepAlive.exe --version
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Clippy Windows target
+        run: cargo clippy --target x86_64-pc-windows-msvc --workspace --all-targets -- -D warnings

@@ -1,191 +1,171 @@
-# BT KeepAlive
+# ![BT KeepAlive icon](btkeepalive-app/icons/32x32.png) BT KeepAlive
 
 [![CI](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml/badge.svg)](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/kadato/bt-keepalive?label=download)](https://github.com/kadato/bt-keepalive/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Keep Bluetooth headphones awake on Windows 10/11**: a small system-tray app that plays quiet audio (or periodic silent pulses) so your headset stays connected and you never miss the first second of a notification, video, or call.
+Bluetooth headphones on Windows sleep after seconds of silence. The next sound then loses its first second. BT KeepAlive plays sound you barely hear so the link stays open.
 
----
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/settings-dark.png">
+  <img alt="Settings window with brown noise at 2 percent" src="docs/screenshots/settings.png" width="420">
+</picture>
 
-## Download
+## Install the app
 
-No Python or install wizard required: grab the portable `.exe` and run it.
+You need Windows 10 or 11. Pick one path.
 
-| Download | Link |
-|----------|------|
-| **BTKeepAlive.exe** (recommended) | [**Download latest release**](https://github.com/kadato/bt-keepalive/releases/latest/download/BTKeepAlive.exe) |
-| Checksum file | [SHA256SUMS.txt](https://github.com/kadato/bt-keepalive/releases/latest/download/SHA256SUMS.txt) |
-| All versions | [GitHub Releases](https://github.com/kadato/bt-keepalive/releases) |
+1. Open [GitHub Releases](https://github.com/kadato/bt-keepalive/releases).
+2. Download `BTKeepAlive-setup.exe`.
+3. Run the setup. The app lands in `%LOCALAPPDATA%\Programs\BTKeepAlive\`.
+4. Start BT KeepAlive from the Start menu. A tray icon appears.
+5. To start the app on every boot, open Settings and turn on **Launch at startup**.
 
-### Quick install
-
-1. Download **BTKeepAlive.exe** using the link above.
-2. Move it to a permanent folder, for example `%LOCALAPPDATA%\Programs\BTKeepAlive\`.
-3. Double-click to run. A tray icon appears: **blue** when playing, **gray** when paused.
-4. Right-click the tray icon → **Launch at startup** if you want it every boot.
-
-> **SmartScreen / antivirus:** Unsigned builds may show a Windows SmartScreen prompt. Choose **More info** → **Run anyway**, or build locally (see [Build from source](#build-from-source)).
-
-### Verify download (optional)
+For a one line install, run this in PowerShell. It downloads the latest setup and runs it.
 
 ```powershell
-Get-FileHash "$env:USERPROFILE\Downloads\BTKeepAlive.exe" -Algorithm SHA256
+irm https://raw.githubusercontent.com/kadato/bt-keepalive/main/install.ps1 | iex
 ```
 
-Compare the hash with `SHA256SUMS.txt` on the [release page](https://github.com/kadato/bt-keepalive/releases/latest).
+For a portable copy, download `BTKeepAlive-portable.zip` from the same release page. Extract both files to one permanent folder and keep them together.
 
----
+- `BTKeepAlive.exe`
+- `WebView2Loader.dll`
 
-## Why use this?
+> [!WARNING]
+> The exe does not start without `WebView2Loader.dll` in the same folder. The DLL ships with every Tauri WebView2 app and is not optional.
 
-Many Bluetooth headphones power down their radio after a short period of silence. When something new plays, the first moment can be clipped while the link reconnects. BT KeepAlive sends a continuous near-inaudible signal, or a periodic quiet pulse, so Windows keeps the audio path active.
+> [!NOTE]
+> SmartScreen may warn about an unsigned build. Pick **More info** and then **Run anyway**.
 
-Inspired by tools like [SoundKeeper](https://github.com/amd/SoundKeeper), but focused on a simple tray experience with multiple noise presets and a mostly-silent pulse mode.
+To verify a download, compare its hash with `SHA256SUMS.txt` on the release page.
 
----
+```powershell
+Get-FileHash "$env:USERPROFILE\Downloads\BTKeepAlive-setup.exe" -Algorithm SHA256
+```
 
-## Features
+## Use the app
 
-- **Noise presets**: white, pink, brown, blue, violet
-- **40 Hz binaural beats** with adjustable carrier (100–300 Hz)
-- **Volume control**: slider dialog plus tray presets
-- **Pulse keepalive**: short quiet pulse on an interval (mostly silent, like SoundKeeper)
-- **Launch at startup**: registry entry when running the built `.exe`
-- **System tray**: play/pause, pulse mode, sound, volume, binaural carrier, startup toggle, quit
+Left-click the tray icon to open Settings. Right-click the tray icon for the short menu: **Play or Pause**, **Settings**, **Check for updates**, **Open logs folder**, **Quit**.
 
----
+![Blue playing tray icon](docs/screenshots/tray-playing.png) Playing. ![Gray paused tray icon](docs/screenshots/tray-paused.png) Paused.
 
-## Using the app
+The Settings window has four cards.
 
-Right-click the tray icon to change sound, volume, and mode. Default is **brown noise** at **2%** volume, usually inaudible at normal listening distance.
+- **Status.** Shows what plays, on which device, at what level, with the **Play** or **Pause** button next to it. An update banner appears here when a new release exists.
+- **Sound.** Picks one of eight presets: white, pink, brown, blue, violet, and 40, 10, and 6 Hz binaural. Picking a preset returns to continuous mode. The **Pulse** tile switches to one short pulse every 55 seconds while playing.
+- **Volume.** Drags a slider, types an exact percent, or picks a quick chip: 0.1, 0.5, 1, 2, 5, or 10 percent. The carrier row appears only for the binaural presets.
+- **System.** Toggles launch at startup, play on startup, and update checks. It also holds the version line, the manual update check, the logs button, and the reset button.
 
-| Tray action | What it does |
-|-------------|--------------|
-| **Play / Pause** | Start or stop the keepalive stream (label shows **Pause** while playing) |
-| **Pulse keepalive** | Toggle pulse mode on/off (checked when pulse mode is active) |
-| **Sound** | Pick a noise preset or **40 Hz binaural** (selecting a preset switches back to continuous mode) |
-| **Volume** | **Adjust volume…** opens a slider dialog; below that, radio presets (0.01%–20%) |
-| **Binaural carrier** | Carrier frequency for **40 Hz binaural**: 100, 150, 200, 250, or 300 Hz |
-| **Launch at startup** | Add/remove from Windows startup; enabled only when running the `.exe` |
-| **Quit** | Exit the app |
+### Pick continuous or pulse
 
-### Continuous vs pulse mode
+**Continuous** is the default. The app plays brown noise at 2 percent, usually inaudible at normal distance.
 
-- **Continuous (default)**: plays your chosen preset at low volume. Best when a tiny background hum is acceptable.
-- **Pulse**: sends a very short, very quiet pulse every ~55 seconds. Best when you want the tray icon active but almost no audible output.
+**Pulse** sends a 1 second pulse every 55 seconds and closes the audio stream between pulses. Pick pulse when you want almost no audible output.
 
-If Bluetooth still drops in pulse mode, lower `pulse_interval_sec` in `config.json`.
+> [!TIP]
+> If Bluetooth still drops in pulse mode, lower `pulse_interval_sec` in `config.json`.
 
----
+## Read config and logs
 
-## Config and logs
-
-Settings live in `%APPDATA%\BTKeepAlive\`:
+Settings live in `%APPDATA%\BTKeepAlive\`.
 
 | File | Purpose |
 |------|---------|
-| `config.json` | Preset, volume, pulse timing, autoplay, etc. |
-| `app.log` | General application log (rotating) |
-| `audio-errors.log` | Audio/stream errors (rotating) |
+| `config.json` | Preset, volume, pulse timing, autoplay, and flags |
+| `app.log` | Application and audio errors |
 
-Set `BTKEEPALIVE_LOG_LEVEL=DEBUG` for verbose logging.
+Before you edit `config.json`, pause the app. The app saves settings on change, so an open editor can lose to the next save.
 
-<details>
-<summary><strong>Config reference</strong></summary>
+| Key | Default | Where to change it |
+|-----|---------|--------------------|
+| `preset` | `brown` | Sound card |
+| `volume` | `0.02` | Volume card |
+| `carrier_hz` | `200` | Carrier row, binaural only |
+| `keepalive_mode` | `continuous` | Sound card **Pulse** tile |
+| `pulse_interval_sec` | `55` | `config.json` only |
+| `pulse_duration_sec` | `1` | `config.json` only |
+| `pulse_amplitude` | `0.0001` | `config.json` only |
+| `autoplay` | `true` | System card as **Play on startup**, or `--no-autoplay`. Starts playback at launch when true. |
+| `launch_at_startup` | `false` | System card |
+| `playing` | `true` | Status card **Play** or **Pause** button |
+| `check_for_updates` | `true` | System card |
 
-| Key | Default | Tray |
-|-----|---------|------|
-| `preset` | `brown` | Sound submenu |
-| `volume` | `0.02` | Volume / Adjust volume… |
-| `carrier_hz` | `200` | Binaural carrier |
-| `keepalive_mode` | `continuous` | Pulse keepalive toggle |
-| `pulse_interval_sec` | `55` | JSON only (pulse mode timing) |
-| `pulse_duration_sec` | `1` | JSON only |
-| `pulse_amplitude` | `0.0001` | JSON only |
-| `sample_rate` | `44100` | JSON only |
-| `buffer_seconds` | `0.012` | JSON only |
-| `autoplay` | `true` | JSON / `--no-autoplay` |
-| `launch_at_startup` | `false` | Launch at startup (.exe only) |
-| `playing` | `true` | Play / Pause |
+## Fix common problems
 
-</details>
+- If the app exits on start with no sound, check the default playback device in Windows sound settings. Then read `app.log`.
+- If you see two icons or an already running message, a copy is already in the tray. Right-click it and pick **Quit**.
+- If the startup toggle fails, run the app as your normal user, not as admin. Then read `app.log`.
+- If antivirus blocks the exe, allowlist the install folder or build from source.
 
----
+## Build from source
 
-## Troubleshooting
-
-| Problem | What to try |
-|---------|-------------|
-| No sound / app exits on start | Check Windows default playback device; see `%APPDATA%\BTKeepAlive\audio-errors.log` |
-| “Already running” | Another instance is in the tray; use **Quit** or Task Manager |
-| Startup toggle fails | Run as your normal user; check `app.log` |
-| Antivirus blocks the `.exe` | One-file PyInstaller builds are sometimes flagged; allowlist the folder or [build locally](#build-from-source) |
-| SmartScreen warning | **More info** → **Run anyway** for unsigned builds |
-
----
-
-## For developers
-
-**Requirements:** Windows 10/11, Python 3.11+
+You need Windows 10 or 11, Rust stable, and Inno Setup 6 for the installer.
 
 ```powershell
 git clone https://github.com/kadato/bt-keepalive.git
 cd bt-keepalive
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
-python -m btkeepalive
+cargo build --release -p btkeepalive-app
 ```
 
-> **Note:** “Launch at startup” only works with the built `.exe`, not `python -m btkeepalive`.
-
-### CLI
+Copy the WebView2 loader next to the exe before you run or ship it. `cargo build` does not do this for you.
 
 ```powershell
-python -m btkeepalive --version
-python -m btkeepalive --config-path
-python -m btkeepalive --no-autoplay
+$loader = Get-ChildItem -Path target\release\build -Recurse -Filter WebView2Loader.dll | Where-Object { $_.FullName -match 'x64' } | Select-Object -First 1
+Copy-Item $loader.FullName target\release\WebView2Loader.dll
+.\target\release\BTKeepAlive.exe --version
 ```
 
-### Build from source
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-pip install -e ".[dev]"
-.\build.ps1
-# Output: dist\BTKeepAlive.exe
-```
-
-Optional installer (requires [Inno Setup 6](https://jrsoftware.org/isinfo.php)):
+Build the installer with Inno Setup.
 
 ```powershell
 iscc installer\BTKeepAlive.iss
-# Output: dist\BTKeepAlive-setup.exe
 ```
 
-### Tests and lint
+The file lands in `dist\BTKeepAlive-setup.exe`.
+
+### Check quality gates
+
+Run all four gates from the repo root before you push.
 
 ```powershell
-pip install -e ".[dev]"
-ruff check .
-ruff format --check .
-pytest
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+node --check btkeepalive-app/settings-ui/main.js
 ```
 
-### Publishing a release
+Windows-only code uses `cfg(target_os = "windows")`. CI compiles that code with `cargo check --target x86_64-pc-windows-msvc` on every push. Full runs, headset tests, and the installer build happen on Windows.
 
-Push a version tag to trigger the GitHub Actions release workflow:
+### Use the CLI
 
 ```powershell
-git tag v1.1.0
-git push origin v1.1.0
+.\target\release\BTKeepAlive.exe --version
+.\target\release\BTKeepAlive.exe --config-path
+.\target\release\BTKeepAlive.exe --no-autoplay
+.\target\release\BTKeepAlive.exe --list-devices
+.\target\release\BTKeepAlive.exe --render-wav $env:TEMP\smoke.wav
 ```
 
-The workflow builds `BTKeepAlive.exe`, writes `SHA256SUMS.txt`, and attaches both to a GitHub Release.
+`--render-wav` writes 5 seconds of the current preset to a WAV file and exits. `--dry-run` renders to a temp file instead.
 
----
+### Publish a release
 
-## License
+Tag the commit to trigger the release workflow. The workflow builds the exe and the installer, publishes them to the GitHub Release for the tag, and uploads checksums.
 
-MIT. See [LICENSE](LICENSE).
+```powershell
+git tag v2.0.0
+git push origin v2.0.0
+```
+
+Find past changes in [CHANGELOG.md](CHANGELOG.md). To report a bug, open an issue in the [issue tracker](https://github.com/kadato/bt-keepalive/issues).
+
+### How the code is laid out
+
+- `btkeepalive-core` holds portable logic: config, volume, DSP noise, binaural beats, pulse timing. It builds and tests anywhere.
+- `btkeepalive-audio` holds precomputed DSP tables, the lock-free render model, the pulse scheduler, and WAV export. Windows adds the `cpal` output stream.
+- `btkeepalive-platform` holds the single-instance mutex, the Run-key startup code, and the event-driven device watcher. Other platforms get stubs for test builds.
+- `btkeepalive-app` holds the `BTKeepAlive` binary: CLI, shared state, updater, tray, and the Tauri settings window in `settings-ui` with vanilla HTML, CSS, and JS.
+
+### How the engine works
+
+The audio engine precomputes 10 seconds per preset once, then loops the table in the output callback. The callback reads the volume from an atomic and never blocks on a lock, so the UI thread cannot stall audio. Tables rebuild off thread when the preset, the carrier, or the mode changes. The pulse scheduler closes the stream between bursts and wakes about 0.5 s early. Device switches arrive as system events and reopen the stream. Config saves debounce 500 ms through a sweeper thread.

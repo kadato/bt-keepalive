@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BT Keepalive Settings</title>
+<link rel="stylesheet" href="styles.css">
+<script src="main.js" defer></script>
+</head>
+<body>
+<main class="window">
+<h1>BT Keepalive</h1>
+
+<section class="card" aria-labelledby="status-heading">
+<h2 id="status-heading">Status</h2>
+<div class="status-row">
+<span id="status-dot" class="dot" aria-hidden="true"></span>
+<p id="status-text" aria-live="polite">Loading…</p>
+</div>
+<button type="button" id="play-toggle" class="btn">Pause</button>
+<div id="update-banner" class="banner" hidden>
+<span id="update-text"></span>
+<button type="button" id="banner-check" class="btn-small">Check again</button>
+</div>
+</section>
+
+<section class="card" aria-labelledby="sound-heading">
+<h2 id="sound-heading">Sound</h2>
+<div class="presets" role="group" aria-label="Noise preset">
+<button type="button" class="preset" data-preset="white" aria-pressed="false">
+<span class="preset-name">White</span>
+<span class="preset-desc">Bright even hiss.</span>
+</button>
+<button type="button" class="preset" data-preset="pink" aria-pressed="false">
+<span class="preset-name">Pink</span>
+<span class="preset-desc">Softer balanced hiss.</span>
+</button>
+<button type="button" class="preset" data-preset="brown" aria-pressed="false">
+<span class="preset-name">Brown</span>
+<span class="preset-desc">Deep low rumble.</span>
+</button>
+<button type="button" class="preset" data-preset="blue" aria-pressed="false">
+<span class="preset-name">Blue</span>
+<span class="preset-desc">Airy high hiss.</span>
+</button>
+<button type="button" class="preset" data-preset="violet" aria-pressed="false">
+<span class="preset-name">Violet</span>
+<span class="preset-desc">Sharp highest hiss.</span>
+</button>
+<button type="button" class="preset" data-preset="binaural40" aria-pressed="false">
+<span class="preset-name">40 Hz binaural</span>
+<span class="preset-desc">Steady 40 Hz tone.</span>
+</button>
+<button type="button" class="preset" data-preset="binaural10" aria-pressed="false">
+<span class="preset-name">10 Hz binaural</span>
+<span class="preset-desc">Calm 10 Hz tone.</span>
+</button>
+<button type="button" class="preset" data-preset="binaural6" aria-pressed="false">
+<span class="preset-name">6 Hz binaural</span>
+<span class="preset-desc">Slow 6 Hz tone.</span>
+</button>
+<button type="button" class="preset" id="pulse-preset" aria-pressed="false">
+<span class="preset-name">Pulse</span>
+<span class="preset-desc">One burst every 55 sec.</span>
+</button>
+</div>
+</section>
+
+<section class="card" aria-labelledby="volume-heading">
+<h2 id="volume-heading">Volume</h2>
+<div class="volume-row">
+<label for="volume-slider">Volume</label>
+<output id="volume-label" for="volume-slider">2%</output>
+</div>
+<input type="range" id="volume-slider" min="0" max="1000" step="1" value="575" aria-describedby="volume-label">
+<div class="exact-row">
+<label for="volume-exact">Exact percent</label>
+<input type="number" id="volume-exact" min="0.01" max="100" step="0.01" value="2">
+<button type="button" id="volume-apply" class="btn">Apply</button>
+</div>
+<div class="chips" role="group" aria-label="Quick volume">
+<button type="button" class="chip" data-volume="0.1">0.1%</button>
+<button type="button" class="chip" data-volume="0.5">0.5%</button>
+<button type="button" class="chip" data-volume="1">1%</button>
+<button type="button" class="chip" data-volume="2">2%</button>
+<button type="button" class="chip" data-volume="5">5%</button>
+<button type="button" class="chip" data-volume="10">10%</button>
+</div>
+<fieldset id="carrier-row" hidden>
+<legend>Carrier frequency</legend>
+<label><input type="radio" name="carrier" value="100"> 100 Hz</label>
+<label><input type="radio" name="carrier" value="150"> 150 Hz</label>
+<label><input type="radio" name="carrier" value="200"> 200 Hz</label>
+<label><input type="radio" name="carrier" value="250"> 250 Hz</label>
+<label><input type="radio" name="carrier" value="300"> 300 Hz</label>
+</fieldset>
+</section>
+
+<section class="card" aria-labelledby="system-heading">
+<h2 id="system-heading">System</h2>
+<label class="check"><input type="checkbox" id="startup-check"><span>Launch at startup</span></label>
+<label class="check"><input type="checkbox" id="autoplay-check"><span>Play on startup. Start playback as soon as the app launches.</span></label>
+<label class="check"><input type="checkbox" id="updates-check"><span>Check for updates</span></label>
+<p id="version-line" class="muted">Version 2.0.0</p>
+<div class="btn-row">
+<button type="button" id="check-now" class="btn">Check for updates now</button>
+<button type="button" id="open-logs" class="btn">Open logs folder</button>
+<button type="button" id="reset-settings" class="btn btn-danger">Reset settings</button>
+</div>
+<div id="error-line" class="error" role="alert" hidden>
+<span id="error-text"></span>
+<button type="button" id="error-dismiss" class="btn-small">Dismiss</button>
+</div>
+</section>
+</main>
+</body>
+</html>

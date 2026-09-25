@@ -1,9 +1,11 @@
-.venv/
-.ci-test-venv/
+# Build output
+target/
 dist/
-build/
-__pycache__/
-*.pyc
-.pytest_cache/
-*.egg-info/
+btkeepalive-app/gen/
+
+# Cargo backup files
+Cargo.lock.bak
+
+# Local settings and logs
 config.json
+*.log

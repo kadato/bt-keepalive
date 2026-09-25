@@ -1,0 +1,31 @@
+[package]
+name = "btkeepalive-app"
+version = "2.0.0"
+description = "BT KeepAlive for Windows: tray app with Fluent settings window"
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "BTKeepAlive"
+path = "src/main.rs"
+
+[dependencies]
+btkeepalive-core = { path = "../btkeepalive-core" }
+btkeepalive-audio = { path = "../btkeepalive-audio" }
+btkeepalive-platform = { path = "../btkeepalive-platform" }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2", features = ["json"] }
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
+
+[build-dependencies]
+tauri-build = "2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+cpal = "0.15"
+windows = { version = "0.58", features = ["Win32_Foundation"] }

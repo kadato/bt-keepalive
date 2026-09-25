@@ -1,0 +1,7 @@
+[workspace]
+members = ["btkeepalive-core", "btkeepalive-audio", "btkeepalive-platform", "btkeepalive-app"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"

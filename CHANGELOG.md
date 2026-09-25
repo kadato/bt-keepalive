@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v2.0.0 (unreleased)
+
+### Features
+
+- Rewrite the app in Rust for Windows 10 and 11
+- Add a Settings window with status, sound, volume, quiet mode, and system sections
+- Flatten the tray menu to Play, Settings, Check for updates, Open logs, and Quit
+- Close the audio stream between pulse bursts to cut wakeups
+- Report device switches through system events instead of polling
+- Render the tray icon in code with no image dependency at runtime
+- Export 5 seconds of audio with `--render-wav` for headless checks
+
+### Breaking Changes
+
+- Drop `sample_rate` and `buffer_seconds` from `config.json`. The engine
+  renders at the device mix rate with system-managed buffering. Old files
+  load fine; both keys disappear on the next save.
+- Replace `audio-errors.log` with entries in `app.log`.
+
 ## v1.4.4 (2026-06-19)
 
 ### Bug Fixes
