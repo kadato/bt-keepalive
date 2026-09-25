@@ -1,6 +1,7 @@
 # ![BT KeepAlive icon](btkeepalive-app/icons/32x32.png) BT KeepAlive
 
 [![CI](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml/badge.svg)](https://github.com/kadato/bt-keepalive/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/kadato/bt-keepalive)](https://github.com/kadato/bt-keepalive/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Bluetooth headphones on Windows sleep after seconds of silence. The next sound then loses its first second. BT KeepAlive plays sound you barely hear so the link stays open.
@@ -10,29 +11,48 @@ Bluetooth headphones on Windows sleep after seconds of silence. The next sound t
   <img alt="Settings window with brown noise at 2 percent" src="docs/screenshots/settings.png" width="420">
 </picture>
 
-## Install the app
+## Download and install
 
-You need Windows 10 or 11. Pick one path.
+Download the latest build from the [releases page](https://github.com/kadato/bt-keepalive/releases/latest), or use the direct links below. Every release ships with `SHA256SUMS.txt`.
 
-1. Open [GitHub Releases](https://github.com/kadato/bt-keepalive/releases).
-2. Download `BTKeepAlive-setup.exe`.
-3. Run the setup. The app lands in `%LOCALAPPDATA%\Programs\BTKeepAlive\`.
-4. Start BT KeepAlive from the Start menu. A tray icon appears.
-5. To start the app on every boot, open Settings and turn on **Launch at startup**.
+| Platform | Package | Notes |
+|----------|---------|-------|
+| Windows | [![Installer](https://img.shields.io/badge/Installer-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/kadato/bt-keepalive/releases/latest/download/BTKeepAlive-setup.exe) | Installer with Start menu entry. Recommended |
+| Windows | [![Portable ZIP](https://img.shields.io/badge/Portable_ZIP-1F6FEB?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/kadato/bt-keepalive/releases/latest/download/BTKeepAlive-portable.zip) | Portable. Extract and run |
 
-For a one line install, run this in PowerShell. It downloads the latest setup and runs it.
+You need Windows 10 or 11.
 
-```powershell
-irm https://raw.githubusercontent.com/kadato/bt-keepalive/main/install.ps1 | iex
-```
+### Installer, recommended
 
-For a portable copy, download `BTKeepAlive-portable.zip` from the same release page. Extract both files to one permanent folder and keep them together.
+1. Download `BTKeepAlive-setup.exe` from the table above.
+2. Run the setup. The app lands in `%LOCALAPPDATA%\Programs\BTKeepAlive\`.
+3. Start BT KeepAlive from the Start menu. A tray icon appears.
+4. To start the app on every boot, open Settings and turn on **Launch at startup**.
+
+### Portable
+
+1. Download `BTKeepAlive-portable.zip` from the table above.
+2. Extract both files to one permanent folder and keep them together.
 
 - `BTKeepAlive.exe`
 - `WebView2Loader.dll`
 
 > [!WARNING]
 > The exe does not start without `WebView2Loader.dll` in the same folder. The DLL ships with every Tauri WebView2 app and is not optional.
+
+### One-line install
+
+Run this in PowerShell. It downloads the latest setup and runs it.
+
+```powershell
+irm https://raw.githubusercontent.com/kadato/bt-keepalive/main/install.ps1 | iex
+```
+
+For a portable copy with the same script:
+
+```powershell
+.\install.ps1 -Portable -Dest "$env:USERPROFILE\Apps\BTKeepAlive"
+```
 
 > [!NOTE]
 > SmartScreen may warn about an unsigned build. Pick **More info** and then **Run anyway**.

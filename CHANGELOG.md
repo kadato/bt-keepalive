@@ -2,7 +2,7 @@
 
 <!-- version list -->
 
-## v2.0.0 (unreleased)
+## v2.0.0 (2026-09-25)
 
 ### Features
 
