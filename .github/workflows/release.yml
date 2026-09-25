@@ -92,7 +92,13 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          # NOTE: the in-app updater (btkeepalive-app/src/updater.rs)
+          # downloads BTKeepAlive.exe plus SHA256SUMS.txt from the
+          # latest release and hot swaps the running exe. Keep both
+          # assets published or auto-update breaks.
           files: |
+            target/release/BTKeepAlive.exe
+            target/release/WebView2Loader.dll
             dist/BTKeepAlive-setup.exe
             dist/BTKeepAlive-portable.zip
             dist/SHA256SUMS.txt

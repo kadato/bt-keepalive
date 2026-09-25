@@ -2,6 +2,15 @@
 
 <!-- version list -->
 
+## v2.0.2 (2026-09-25)
+
+### Bug Fixes
+
+- Publish `BTKeepAlive.exe` and `WebView2Loader.dll` to the GitHub
+  Release. The in-app updater downloads the bare exe plus
+  `SHA256SUMS.txt` and hot swaps it, so without these assets every
+  update check failed with `release is missing exe or checksum assets`.
+
 ## v2.0.1 (2026-09-25)
 
 ### Bug Fixes

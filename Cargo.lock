@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "btkeepalive-app"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "btkeepalive-audio",
  "btkeepalive-core",

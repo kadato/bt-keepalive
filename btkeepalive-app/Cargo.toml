@@ -1,6 +1,6 @@
 [package]
 name = "btkeepalive-app"
-version = "2.0.1"
+version = "2.0.2"
 description = "BT KeepAlive for Windows: tray app with Fluent settings window"
 edition.workspace = true
 license.workspace = true
