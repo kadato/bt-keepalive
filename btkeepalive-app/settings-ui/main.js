@@ -36,11 +36,12 @@ const mockState = {
   status: "playing",
   version: "2.0.0",
   update: null,
+  update_error: null,
 };
 
-async function invoke(cmd, args) {
+async function invokeWith(cmd, args, ms) {
   if (tauriInvoke) {
-    return withTimeout(tauriInvoke(cmd, args || {}), 8000, cmd);
+    return withTimeout(tauriInvoke(cmd, args || {}), ms, cmd);
   }
   if (runningInTauriWebview()) {
     throw new Error("Tauri bridge missing for " + cmd);
@@ -69,11 +70,23 @@ async function invoke(cmd, args) {
         status: "playing", update: null,
       });
       break;
-    case "check_updates": s.update = { version: "v2.1.0" }; break;
+    case "check_updates":
+      s.update = { version: "v2.1.0", notes: "Fixes and improvements." };
+      s.update_error = null;
+      break;
+    case "install_update":
+      s.version = (s.update && s.update.version.replace(/^v/, "")) || s.version;
+      s.update = null;
+      s.update_error = null;
+      break;
     case "open_logs": return { ok: true };
     default: return { ok: false, error: "unknown command: " + cmd };
   }
   return { ok: true, state: structuredClone(s) };
+}
+
+async function invoke(cmd, args) {
+  return invokeWith(cmd, args, 8000);
 }
 
 // Log-volume mapping: slider 0..1000 <-> gain = 0.0001 * (10000 ^ (pos/1000)).
@@ -100,6 +113,7 @@ const PRESET_NAMES = {
 const el = (id) => document.getElementById(id);
 let state = null;
 let checking = false;
+let installing = false;
 
 function withTimeout(promise, ms, cmd) {
   let timer = null;
@@ -168,9 +182,27 @@ function render() {
 
   const hasUpdate = !!state.update;
   el("update-banner").hidden = !hasUpdate;
-  if (hasUpdate) el("update-text").textContent = "Update " + state.update.version + " available";
-  el("banner-check").disabled = checking;
-  el("banner-check").textContent = checking ? "Checking…" : "Check again";
+  if (!hasUpdate) installing = false;
+  if (hasUpdate) {
+    el("update-text").textContent = "Update " + state.update.version + " available";
+    const notes = state.update.notes || "";
+    el("update-details").hidden = !notes;
+    if (notes) el("update-notes").textContent = notes;
+    const status = el("update-status");
+    if (installing) {
+      status.hidden = false;
+      status.textContent = "Installing " + state.update.version + ". The app will restart.";
+    } else if (state.update_error) {
+      status.hidden = false;
+      status.textContent = "Update failed: " + state.update_error;
+    } else {
+      status.hidden = true;
+      status.textContent = "";
+    }
+    const installBtn = el("banner-install");
+    installBtn.disabled = installing;
+    installBtn.textContent = installing ? "Installing…" : "Install update";
+  }
 
   document.querySelectorAll(".preset[data-preset]").forEach((b) => {
     b.setAttribute("aria-pressed", String(b.dataset.preset === state.preset));
@@ -202,6 +234,28 @@ function render() {
   checkBtn.disabled = checking;
   checkBtn.textContent = checking ? "Checking…" : "Check for updates now";
   checkBtn.setAttribute("aria-busy", String(checking));
+}
+
+async function installUpdate() {
+  if (installing || !state || !state.update) return;
+  installing = true;
+  render();
+  try {
+    // A slow download can outlast the usual 8 s command budget.
+    const res = await invokeWith("install_update", {}, 60000);
+    // On success the process relaunches into the new version and
+    // this line never runs.
+    installing = false;
+    applyEnvelope(res);
+  } catch (e) {
+    installing = false;
+    const msg = String((e && e.message) || e);
+    showError(msg.includes("timed out")
+      ? "Taking longer than a minute. If the app does not restart, check app.log."
+      : msg);
+  } finally {
+    render();
+  }
 }
 
 async function checkForUpdates() {
@@ -272,7 +326,7 @@ function bind() {
   });
 
   el("check-now").addEventListener("click", checkForUpdates);
-  el("banner-check").addEventListener("click", checkForUpdates);
+  el("banner-install").addEventListener("click", installUpdate);
   el("open-logs").addEventListener("click", async () => {
     try {
       const res = await invoke("open_logs", {});

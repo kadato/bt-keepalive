@@ -21,6 +21,8 @@ pub const CHECKSUM_ASSET: &str = "SHA256SUMS.txt";
 pub struct UpdateInfo {
     /// Release tag, for example `v2.1.0`.
     pub version: String,
+    /// Release notes body, may be empty.
+    pub notes: String,
     /// Direct download URL for the exe.
     pub download_url: String,
     /// Direct download URL for the checksum file.
@@ -90,9 +92,15 @@ pub fn check_for_update(repo: &str, current: &str) -> Result<Option<UpdateInfo>,
     if tag.is_empty() || !is_newer(tag, current) {
         return Ok(None);
     }
+    let notes = release
+        .get("body")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
     match pick_assets(&release) {
         Some((download_url, checksum_url)) => Ok(Some(UpdateInfo {
             version: tag.to_string(),
+            notes,
             download_url,
             checksum_url,
         })),

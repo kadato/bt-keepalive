@@ -22,6 +22,8 @@ const SAVE_DEBOUNCE: Duration = Duration::from_millis(500);
 pub struct UiUpdate {
     /// Release tag, for example `v2.1.0`.
     pub version: String,
+    /// Release notes body, empty when the release has none.
+    pub notes: String,
 }
 
 /// Full state snapshot matching the settings-ui contract.
@@ -40,6 +42,7 @@ pub struct UiState {
     pub status: String,
     pub version: String,
     pub update: Option<UiUpdate>,
+    pub update_error: Option<String>,
 }
 
 /// Shared state for CLI, tray, and Tauri commands.
@@ -55,6 +58,7 @@ pub struct AppState {
     device_name: RwLock<Option<String>>,
     device_error: RwLock<Option<String>>,
     update: Mutex<Option<UiUpdate>>,
+    update_error: Mutex<Option<String>>,
 }
 
 impl AppState {
@@ -72,6 +76,7 @@ impl AppState {
             device_name: RwLock::new(None),
             device_error: RwLock::new(None),
             update: Mutex::new(None),
+            update_error: Mutex::new(None),
         }
         .into_ready()
     }
@@ -118,6 +123,7 @@ impl AppState {
             status,
             version: env!("CARGO_PKG_VERSION").to_string(),
             update: self.update.lock().expect("update lock").clone(),
+            update_error: self.update_error.lock().expect("update error lock").clone(),
         }
     }
 
@@ -188,8 +194,13 @@ impl AppState {
     }
 
     /// Record available update info for the banner.
-    pub fn set_update(&self, version: Option<String>) {
-        *self.update.lock().expect("update lock") = version.map(|version| UiUpdate { version });
+    pub fn set_update(&self, update: Option<UiUpdate>) {
+        *self.update.lock().expect("update lock") = update;
+    }
+
+    /// Record a failed update attempt so the banner can show it.
+    pub fn set_update_error(&self, error: Option<String>) {
+        *self.update_error.lock().expect("update error lock") = error;
     }
 
     /// Replace all settings with defaults, keeping the update banner.
@@ -286,11 +297,31 @@ mod tests {
             "status",
             "version",
             "update",
+            "update_error",
         ] {
             assert!(json.get(key).is_some(), "missing {key}");
         }
         assert_eq!(json["preset"], "brown");
         assert_eq!(json["status"], "playing");
+    }
+
+    #[test]
+    fn update_banner_carries_notes_and_error() {
+        let (_d, s) = state();
+        s.set_update(Some(UiUpdate {
+            version: "v2.1.0".to_string(),
+            notes: "Fixes".to_string(),
+        }));
+        s.set_update_error(Some("boom".to_string()));
+        let snap = s.snapshot();
+        assert_eq!(snap.update.as_ref().unwrap().version, "v2.1.0");
+        assert_eq!(snap.update.as_ref().unwrap().notes, "Fixes");
+        assert_eq!(snap.update_error.as_deref(), Some("boom"));
+        s.set_update(None);
+        s.set_update_error(None);
+        let snap = s.snapshot();
+        assert!(snap.update.is_none());
+        assert!(snap.update_error.is_none());
     }
 
     #[test]

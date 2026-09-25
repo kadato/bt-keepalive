@@ -20,7 +20,14 @@
 <button type="button" id="play-toggle" class="btn">Pause</button>
 <div id="update-banner" class="banner" hidden>
 <span id="update-text"></span>
-<button type="button" id="banner-check" class="btn-small">Check again</button>
+<div class="banner-actions">
+<button type="button" id="banner-install" class="btn-small">Install update</button>
+</div>
+<details id="update-details">
+<summary>What's new</summary>
+<pre id="update-notes"></pre>
+</details>
+<p id="update-status" class="muted" hidden></p>
 </div>
 </section>
 

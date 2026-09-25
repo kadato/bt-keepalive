@@ -7,7 +7,7 @@
 ;   iscc /DExeDir="..\target\x86_64-pc-windows-msvc\release" installer\BTKeepAlive.iss
 #define MyAppName "BT KeepAlive"
 #ifndef MyAppVersion
-#define MyAppVersion "2.0.2"
+#define MyAppVersion "2.1.0"
 #endif
 #ifndef ExeDir
 #define ExeDir "..\target\release"

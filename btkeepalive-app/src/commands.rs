@@ -147,14 +147,54 @@ pub fn check_updates(ctx: State<'_, CommandContext>) -> serde_json::Value {
     let version = env!("CARGO_PKG_VERSION").to_string();
     match updater::check_for_update(updater::DEFAULT_REPO, &version) {
         Ok(Some(info)) => {
-            ctx.state.set_update(Some(info.version.clone()));
+            ctx.state.set_update(Some(crate::state::UiUpdate {
+                version: info.version,
+                notes: info.notes,
+            }));
+            ctx.state.set_update_error(None);
             respond(&ctx)
         }
         Ok(None) => {
             ctx.state.set_update(None);
+            ctx.state.set_update_error(None);
             respond(&ctx)
         }
         Err(e) => fail(e),
+    }
+}
+
+/// Download, verify, and hot swap the update from the settings
+/// window. On success the process relaunches into the new version
+/// and this command never returns. On failure the banner keeps the
+/// error text so it stays visible after the window re-renders.
+#[tauri::command]
+pub fn install_update(ctx: State<'_, CommandContext>) -> serde_json::Value {
+    let version = env!("CARGO_PKG_VERSION").to_string();
+    let info = match updater::check_for_update(updater::DEFAULT_REPO, &version) {
+        Ok(Some(info)) => info,
+        Ok(None) => {
+            ctx.state.set_update(None);
+            ctx.state.set_update_error(None);
+            return respond(&ctx);
+        }
+        Err(e) => {
+            ctx.state.set_update_error(Some(e.clone()));
+            return fail(e);
+        }
+    };
+    ctx.state.set_update(Some(crate::state::UiUpdate {
+        version: info.version.clone(),
+        notes: info.notes.clone(),
+    }));
+    ctx.state.set_update_error(None);
+    let exe = std::env::current_exe().unwrap_or_default();
+    let cancelled = std::sync::atomic::AtomicBool::new(false);
+    match updater::install_update(&info, &exe, |_, _| {}, &cancelled) {
+        Ok(_) => respond(&ctx),
+        Err(e) => {
+            ctx.state.set_update_error(Some(e.clone()));
+            fail(e)
+        }
     }
 }
 

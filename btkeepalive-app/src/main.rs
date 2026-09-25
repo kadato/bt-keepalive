@@ -205,7 +205,10 @@ fn run_windows(cli: Cli) {
                     if state.config_snapshot().check_for_updates {
                         let version = env!("CARGO_PKG_VERSION").to_string();
                         match updater::check_for_update(updater::DEFAULT_REPO, &version) {
-                            Ok(Some(info)) => state.set_update(Some(info.version)),
+                            Ok(Some(info)) => state.set_update(Some(crate::state::UiUpdate {
+                                version: info.version,
+                                notes: info.notes,
+                            })),
                             Ok(None) => {}
                             Err(e) => log_line(&format!("update check failed: {e}")),
                         }
@@ -284,6 +287,7 @@ fn run_tauri(
             commands::set_check_updates,
             commands::reset_settings,
             commands::check_updates,
+            commands::install_update,
             commands::open_logs,
         ]);
 
@@ -354,16 +358,24 @@ fn run_update_flow(state: &Arc<AppState>) {
             return;
         }
         Err(e) => {
+            state.set_update_error(Some(e.clone()));
             log_line(&format!("update check failed: {e}"));
             return;
         }
     };
-    state.set_update(Some(info.version.clone()));
+    state.set_update(Some(crate::state::UiUpdate {
+        version: info.version.clone(),
+        notes: info.notes.clone(),
+    }));
+    state.set_update_error(None);
     let exe = std::env::current_exe().unwrap_or_default();
     let cancelled = std::sync::atomic::AtomicBool::new(false);
     match updater::install_update(&info, &exe, |_, _| {}, &cancelled) {
         Ok(_) => {}
-        Err(e) => log_line(&format!("update install failed: {e}")),
+        Err(e) => {
+            state.set_update_error(Some(e.clone()));
+            log_line(&format!("update install failed: {e}"));
+        }
     }
 }
 

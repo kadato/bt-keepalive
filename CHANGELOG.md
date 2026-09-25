@@ -2,6 +2,16 @@
 
 <!-- version list -->
 
+## v2.1.0 (2026-09-25)
+
+### Features
+
+- Install updates from the Settings window. The update banner has an
+  Install update button instead of a second check button.
+- Show release notes under What's new in the update banner.
+- Keep a failed update attempt visible in the banner until the next
+  check or install.
+
 ## v2.0.2 (2026-09-25)
 
 ### Bug Fixes
