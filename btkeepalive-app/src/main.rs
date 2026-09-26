@@ -269,8 +269,14 @@ fn run_tauri(
                 std::thread::Builder::new()
                     .name("tray-events".to_string())
                     .spawn(move || {
-                        while let Ok(id) = clicks_rx.recv() {
-                            handle_menu_event(&handle, &menu_ctx, &menu_tray, id.as_str());
+                        while let Ok(click) = clicks_rx.recv() {
+                            handle_menu_event(
+                                &handle,
+                                &menu_ctx,
+                                &menu_tray,
+                                click.id.as_str(),
+                                click.position,
+                            );
                         }
                     })
                     .expect("tray thread spawns");
@@ -324,6 +330,7 @@ fn handle_menu_event(
     ctx: &crate::commands::CommandContext,
     tray: &Arc<crate::tray::TrayState>,
     id: &str,
+    position: Option<tauri::PhysicalPosition<f64>>,
 ) {
     use crate::tray::{ID_LOGS, ID_PLAY, ID_QUIT, ID_SETTINGS, ID_UPDATE};
 
@@ -333,10 +340,7 @@ fn handle_menu_event(
         state.set_playing(playing);
         crate::commands::rebuild_audio_ctx(ctx);
     } else if id == ID_SETTINGS {
-        if let Some(window) = handle.get_webview_window("main") {
-            let _ = window.show();
-            let _ = window.set_focus();
-        }
+        crate::tray::show_main_window(handle, position);
     } else if id == ID_UPDATE {
         let state_clone = Arc::clone(state);
         let tray_clone = Arc::clone(tray);
