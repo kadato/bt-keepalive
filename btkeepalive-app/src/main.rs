@@ -171,7 +171,9 @@ fn run_windows(cli: Cli) {
             .expect("sweeper thread spawns");
     }
 
-    // Device watcher: rebuild the stream on endpoint changes.
+    // Device watcher: reopen the stream on endpoint changes. Handles
+    // both default switches and add or remove events, so a headset that
+    // connects late, disconnects, or reconnects is followed within seconds.
     {
         let state = Arc::clone(&state);
         let audio = Arc::clone(&audio);
@@ -182,15 +184,18 @@ fn run_windows(cli: Cli) {
             .spawn(move || {
                 let _keep = _shutdown;
                 while let Ok(event) = rx.recv() {
-                    if event == device::DeviceEvent::DefaultOutputChanged {
-                        state.set_device(
-                            btkeepalive_audio::stream_cpal::OutputStream::device_name(),
-                            None,
-                        );
-                        let snapshot = state.config_snapshot();
-                        if let Ok(guard) = audio.lock() {
-                            if let Some(manager) = guard.as_ref() {
-                                manager.rebuild(&snapshot);
+                    match event {
+                        device::DeviceEvent::DefaultOutputChanged
+                        | device::DeviceEvent::DeviceListChanged => {
+                            state.set_device(
+                                btkeepalive_audio::stream_cpal::OutputStream::device_name(),
+                                None,
+                            );
+                            let snapshot = state.config_snapshot();
+                            if let Ok(guard) = audio.lock() {
+                                if let Some(manager) = guard.as_ref() {
+                                    manager.device_changed(&snapshot);
+                                }
                             }
                         }
                     }
