@@ -19,5 +19,5 @@ pub mod wav;
 pub mod stream_cpal;
 
 pub use model::{RenderModel, RenderParams};
-pub use scheduler::{PulseScheduler, SchedulerAction};
+pub use scheduler::{OpenRetry, PulseRuntime, PulseScheduler, SchedulerAction};
 pub use tables::{build_binaural_table, build_preset_table};
