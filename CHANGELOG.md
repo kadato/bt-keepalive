@@ -2,6 +2,21 @@
 
 <!-- version list -->
 
+## v2.2.0 (2026-09-26)
+
+### Features
+
+- Dock the Settings window to the right edge above the taskbar when
+  opened from the tray, so the mouse stays close to the window.
+- Reopen audio on headset connect, disconnect, and default-device
+  switches within seconds, retrying a missing headset with backoff.
+
+### Bug Fixes
+
+- Start paused when autoplay is off, so the tray stops claiming
+  playing while silent.
+- Remove the duplicated Volume label in the Settings volume card.
+
 ## v2.1.0 (2026-09-25)
 
 ### Features
