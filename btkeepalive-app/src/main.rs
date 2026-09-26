@@ -136,6 +136,11 @@ fn run_windows(cli: Cli) {
     if cli.no_autoplay {
         config.autoplay = false;
     }
+    // Autoplay off means start paused, even if the saved file says playing.
+    // Without this the tray would say playing while audio stays silent.
+    if !config.autoplay {
+        config.playing = false;
+    }
 
     // Sync the Run key with settings on launch.
     if config.launch_at_startup {
