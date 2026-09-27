@@ -2,6 +2,13 @@
 
 <!-- version list -->
 
+## v2.2.1 (2026-09-27)
+
+### Bug Fixes
+
+- Show the exact percent once in the Volume header as an editable
+  field, and tighten the header so no gap sits under the title.
+
 ## v2.2.0 (2026-09-26)
 
 ### Features
