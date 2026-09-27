@@ -211,9 +211,8 @@ function render() {
 
   const pos = gainToSlider(state.volume);
   const slider = el("volume-slider");
-  if (document.activeElement !== slider) slider.value = String(pos);
-  el("volume-label").textContent = pct + "%";
   const exact = el("volume-exact");
+  if (document.activeElement !== slider) slider.value = String(pos);
   if (document.activeElement !== exact) exact.value = pct;
 
   const isBinaural = state.preset.startsWith("binaural");
@@ -283,21 +282,33 @@ function bind() {
   });
 
   const slider = el("volume-slider");
-  // Live label on input, persist to backend only on change (settled value).
+  const exact = el("volume-exact");
+  // Single editable percent in the Volume header. Slider drags update it
+  // live, typing updates the slider preview, commit happens on change.
   slider.addEventListener("input", () => {
-    el("volume-label").textContent = formatPercent(sliderToGain(Number(slider.value))) + "%";
+    exact.value = formatPercent(sliderToGain(Number(slider.value)));
   });
   slider.addEventListener("change", () => {
     run("set_volume", { volume: sliderToGain(Number(slider.value)) });
   });
 
-  el("volume-apply").addEventListener("click", () => {
-    const pct = Number(el("volume-exact").value);
+  exact.addEventListener("input", () => {
+    const pct = Number(exact.value);
+    if (Number.isFinite(pct) && pct >= 0.01 && pct <= 100) {
+      slider.value = String(gainToSlider(pct / 100));
+    }
+  });
+  exact.addEventListener("change", () => {
+    const pct = Number(exact.value);
     if (!Number.isFinite(pct) || pct < 0.01 || pct > 100) {
       showError("Enter a percent between 0.01 and 100.");
+      if (state) exact.value = formatPercent(state.volume);
       return;
     }
     run("set_volume", { volume: pct / 100 });
+  });
+  exact.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") exact.blur();
   });
 
   document.querySelectorAll(".chip").forEach((c) => {
