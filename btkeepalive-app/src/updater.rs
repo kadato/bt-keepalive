@@ -75,15 +75,25 @@ pub fn pick_assets(release: &serde_json::Value) -> Option<(String, String)> {
     Some((exe?, sums?))
 }
 
+/// Build an agent with a global timeout, preserving the per-request
+/// timeouts the code used under ureq 2.
+fn agent_with_timeout(secs: u64) -> ureq::Agent {
+    ureq::Agent::config_builder()
+        .timeout_global(Some(std::time::Duration::from_secs(secs)))
+        .build()
+        .into()
+}
+
 /// Fetch the latest release and return update info when newer.
 pub fn check_for_update(repo: &str, current: &str) -> Result<Option<UpdateInfo>, String> {
     let url = format!("https://api.github.com/repos/{repo}/releases/latest");
-    let release: serde_json::Value = ureq::get(&url)
-        .set("User-Agent", "BTKeepAlive-Updater")
-        .timeout(std::time::Duration::from_secs(10))
+    let release: serde_json::Value = agent_with_timeout(10)
+        .get(&url)
+        .header("User-Agent", "BTKeepAlive-Updater")
         .call()
         .map_err(|e| format!("release query failed: {e}"))?
-        .into_json()
+        .body_mut()
+        .read_json()
         .map_err(|e| format!("release parse failed: {e}"))?;
     let tag = release
         .get("tag_name")
@@ -110,12 +120,13 @@ pub fn check_for_update(repo: &str, current: &str) -> Result<Option<UpdateInfo>,
 
 /// Download the expected SHA256 for the exe from the checksum file.
 pub fn fetch_expected_sha256(url: &str) -> Result<String, String> {
-    let text = ureq::get(url)
-        .set("User-Agent", "BTKeepAlive-Updater")
-        .timeout(std::time::Duration::from_secs(10))
+    let text = agent_with_timeout(10)
+        .get(url)
+        .header("User-Agent", "BTKeepAlive-Updater")
         .call()
         .map_err(|e| format!("checksum fetch failed: {e}"))?
-        .into_string()
+        .body_mut()
+        .read_to_string()
         .map_err(|e| format!("checksum read failed: {e}"))?;
     for line in text.lines() {
         let mut parts = line.split_whitespace();
@@ -140,7 +151,11 @@ pub fn file_sha256(path: &Path) -> io::Result<String> {
         }
         hasher.update(&buf[..n]);
     }
-    Ok(format!("{:x}", hasher.finalize()))
+    Ok(hasher
+        .finalize()
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect())
 }
 
 /// Download with progress reports and cooperative cancellation.
@@ -150,16 +165,19 @@ pub fn download_file(
     progress: impl Fn(u64, u64),
     cancelled: &AtomicBool,
 ) -> Result<(), String> {
-    let response = ureq::get(url)
-        .set("User-Agent", "BTKeepAlive-Updater")
-        .timeout(std::time::Duration::from_secs(15))
+    let response = agent_with_timeout(15)
+        .get(url)
+        .header("User-Agent", "BTKeepAlive-Updater")
         .call()
         .map_err(|e| format!("download failed: {e}"))?;
     let total: u64 = response
-        .header("content-length")
+        .headers()
+        .get("content-length")
+        .and_then(|v| v.to_str().ok())
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
-    let mut reader = response.into_reader();
+    let (_, body) = response.into_parts();
+    let mut reader = body.into_reader();
     let mut out = File::create(dest).map_err(|e| format!("cannot write file: {e}"))?;
     let mut downloaded = 0u64;
     let mut buf = [0u8; 65536];
