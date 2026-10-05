@@ -28,4 +28,4 @@ tauri-build = "2"
 [target.'cfg(target_os = "windows")'.dependencies]
 tauri = { version = "2", features = ["tray-icon"] }
 cpal = "0.18"
-windows = { version = "0.58", features = ["Win32_Foundation"] }
+windows = { version = "0.62", features = ["Win32_Foundation"] }
