@@ -19,5 +19,5 @@ windows = { version = "0.58", features = [
   "Win32_UI_WindowsAndMessaging",
   "implement",
 ] }
-windows-core = "0.58"
-windows-registry = "0.2"
+windows-core = "0.62"
+windows-registry = "0.100"
