@@ -78,7 +78,7 @@ jobs:
           "$($zip.Hash)  BTKeepAlive-portable.zip" | Out-File -FilePath dist\SHA256SUMS.txt -Append -Encoding utf8
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: btkeepalive-windows
           path: |
@@ -90,7 +90,7 @@ jobs:
 
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           # NOTE: the in-app updater (btkeepalive-app/src/updater.rs)
           # downloads BTKeepAlive.exe plus SHA256SUMS.txt from the
