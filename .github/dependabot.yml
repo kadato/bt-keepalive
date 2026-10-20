@@ -1,18 +1,23 @@
 version: 2
-updates:
-  - package-ecosystem: cargo
-    directory: /
+
+multi-ecosystem-groups:
+  dependencies:
     schedule:
       interval: weekly
       day: monday
+      time: "04:00"
+      timezone: "Etc/UTC"
     commit-message:
       prefix: "build"
       prefix-development: "build"
       include: "scope"
-    groups:
-      rust:
-        patterns:
-          - "*"
+
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    multi-ecosystem-group: dependencies
+    patterns:
+      - "*"
     # cpal, windows-core, and windows-registry need code migrations
     # (cpal 0.16+ audio stream API, windows 0.59+ PROPERTYKEY move and
     # implement macro change). Hold them back until that work lands;
@@ -24,14 +29,6 @@ updates:
 
   - package-ecosystem: github-actions
     directory: /
-    schedule:
-      interval: weekly
-      day: monday
-    commit-message:
-      prefix: "build"
-      prefix-development: "build"
-      include: "scope"
-    groups:
-      actions:
-        patterns:
-          - "*"
+    multi-ecosystem-group: dependencies
+    patterns:
+      - "*"
